@@ -2937,7 +2937,7 @@ public final class Client extends GameEngine implements class302 {
                   field1028 = false;
                   field1089 = 0;
 
-                  while(class298.method5361() && field1089 < 128) {
+                  while(IgnoreContainer.method5361() && field1089 < 128) {
                      if(rights >= 2 && KeyFocusListener.keyPressed[82] && class303.currentPressedKey == 66) {
                         String var40 = class19.method162();
                         InvType.clientInstance.method905(var40);
@@ -3251,7 +3251,7 @@ public final class Client extends GameEngine implements class302 {
                                              return;
                                           }
 
-                                          var38 = var42.widget;
+                                          var38 = var42.source;
                                           if(var38.index < 0) {
                                              break;
                                           }
@@ -3263,7 +3263,7 @@ public final class Client extends GameEngine implements class302 {
                                     }
                                  }
 
-                                 var38 = var42.widget;
+                                 var38 = var42.source;
                                  if(var38.index < 0) {
                                     break;
                                  }
@@ -3275,7 +3275,7 @@ public final class Client extends GameEngine implements class302 {
                            }
                         }
 
-                        var38 = var42.widget;
+                        var38 = var42.source;
                         if(var38.index < 0) {
                            break;
                         }
@@ -4061,7 +4061,7 @@ public final class Client extends GameEngine implements class302 {
 
                var56[0] = new Integer(var3.readInt());
                ScriptEvent var58 = new ScriptEvent();
-               var58.objs = var56;
+               var58.params = var56;
                class71.method1203(var58);
                var1.serverPacket = null;
                return true;
@@ -4132,7 +4132,7 @@ public final class Client extends GameEngine implements class302 {
             }
 
             if(ServerPacket.field2357 == var1.serverPacket) {
-               CacheFile.friendManager.field1238.method5351(var3, var1.packetLength);
+               CacheFile.friendManager.ignoreContainer.method5351(var3, var1.packetLength);
                Size.method183();
                field1045 = cycleCntr;
                var1.serverPacket = null;
@@ -5088,10 +5088,10 @@ public final class Client extends GameEngine implements class302 {
          ScriptEvent var8;
          if(draggedWidget.onDragListener != null && draggingWidget) {
             var8 = new ScriptEvent();
-            var8.widget = draggedWidget;
-            var8.field787 = var6;
-            var8.field780 = var7;
-            var8.objs = draggedWidget.onDragListener;
+            var8.source = draggedWidget;
+            var8.mouseX = var6;
+            var8.mouseY = var7;
+            var8.params = draggedWidget.onDragListener;
             class71.method1203(var8);
          }
 
@@ -5099,11 +5099,11 @@ public final class Client extends GameEngine implements class302 {
             if(draggingWidget) {
                if(draggedWidget.onDragCompleteListener != null) {
                   var8 = new ScriptEvent();
-                  var8.widget = draggedWidget;
-                  var8.field787 = var6;
-                  var8.field780 = var7;
-                  var8.field776 = draggedOnWidget;
-                  var8.objs = draggedWidget.onDragCompleteListener;
+                  var8.source = draggedWidget;
+                  var8.mouseX = var6;
+                  var8.mouseY = var7;
+                  var8.target = draggedOnWidget;
+                  var8.params = draggedWidget.onDragCompleteListener;
                   class71.method1203(var8);
                }
 

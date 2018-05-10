@@ -32,11 +32,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import lombok.AccessLevel;
@@ -52,6 +50,8 @@ import net.runelite.api.events.FocusChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.GraphicsObjectCreated;
+import net.runelite.api.events.ConfigChanged;
+import net.runelite.api.events.FocusChanged;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
@@ -95,6 +95,9 @@ public class NpcIndicatorsPlugin extends Plugin
 	@Inject
 	private KeyManager keyManager;
 
+	/**
+	 * NPCs tagged with the Tag option
+	 */
 	@Getter(AccessLevel.PACKAGE)
 	private Set<Integer> npcTags;
 
@@ -107,6 +110,9 @@ public class NpcIndicatorsPlugin extends Plugin
 	@Getter(AccessLevel.PACKAGE)
 	private Map<Integer, MemorizedNpc> highlightedMemorizedNpcs;
 
+	/**
+	 * NPCs tagged due to highlight in the config
+	 */
 	@Getter(AccessLevel.PACKAGE)
 	private Instant lastTickUpdate;
 
@@ -126,6 +132,14 @@ public class NpcIndicatorsPlugin extends Plugin
 	private WorldPoint lastPlayerLocation;
 
 	private boolean skipNextSpawnCheck = false;
+
+	private final Set<NPC> highlightedNpcs = new HashSet<>();
+
+	/**
+	 * Highlight strings from the configuration
+	 */
+	private List<String> highlights = new ArrayList<>();
+
 
 	private boolean hotKeyPressed = false;
 
@@ -182,6 +196,9 @@ public class NpcIndicatorsPlugin extends Plugin
 		this.teleportGraphicsObjectSpawnedThisTick = new HashSet<>();
 		keyManager.registerKeyListener(inputListener);
 		this.updateStringsToMatch();
+
+		highlights = getHighlights();
+		rebuildNpcs();
 	}
 
 	@Override
@@ -237,6 +254,16 @@ public class NpcIndicatorsPlugin extends Plugin
 	private void addHighlightedMemorizedNpc(MemorizedNpc mn, NPC npc)
 	{
 		if (mn != null)
+
+		npcTags.clear();
+		highlightedNpcs.clear();
+		keyManager.unregisterKeyListener(inputListener);
+	}
+
+	@Subscribe
+	public void onConfigChanged(ConfigChanged configChanged)
+	{
+		if (!configChanged.getGroup().equals("npcindicators"))
 		{
 			mn.setDiedOnTick(tickCounter + 1); // This rune before tickCounter updates, so we add 1
 			if (!mn.getPossibleRespawnLocations().isEmpty())
@@ -388,6 +415,26 @@ public class NpcIndicatorsPlugin extends Plugin
 	{
 		Set<NPC> npcSet = new HashSet<>();
 
+		highlights = getHighlights();
+		rebuildNpcs();
+	}
+
+	private List<String> getHighlights()
+	{
+		String configNpcs = config.getNpcToHighlight().toLowerCase();
+		if (configNpcs.isEmpty())
+			return Collections.emptyList();
+
+		List<String> highlightedNpcs = Arrays.asList(configNpcs.split(DELIMITER_REGEX));
+		return highlightedNpcs;
+	}
+
+	/**
+	 * Rebuild highlighted npcs
+	 */
+	private void rebuildNpcs()
+	{
+		highlightedNpcs.clear();
 		for (NPC npc : client.getNpcs())
 		{
 			String npcName = npc.getName();
@@ -397,11 +444,55 @@ public class NpcIndicatorsPlugin extends Plugin
 				continue;
 			}
 
+
 			if (shouldHighlightNpc(npcName))
 			{
 				npcSet.add(npc);
+			for (String highlight : highlights)
+			{
+				if (WildcardMatcher.matches(highlight, npcName))
+				{
+					highlightedNpcs.add(npc);
+					break;
+				}
 			}
 		}
+	}
+
+	@Subscribe
+	public void onFocusChanged(FocusChanged focusChanged)
+	{
+		// If you somehow manage to right click while holding shift, then click off screen
+		if (!focusChanged.isFocused() && hotKeyPressed)
+		{
+			updateNpcMenuOptions(false);
+		}
+	}
+
+	@Subscribe
+	public void onMenuObjectClicked(MenuOptionClicked click)
+	{
+		if (click.getMenuOption().equals(TAG))
+			toggleTag(click.getId());
+	}
+
+	@Subscribe
+	public void onNpcSpawned(NpcSpawned npcSpawned)
+	{
+		NPC npc = npcSpawned.getNpc();
+		String npcName = npc.getName();
+		if (npcName != null)
+		{
+			for (String highlight : highlights)
+			{
+				if (WildcardMatcher.matches(highlight, npcName))
+				{
+					highlightedNpcs.add(npc);
+					break;
+				}
+			}
+		}
+	}
 
 		return npcSet;
 	}
@@ -419,6 +510,19 @@ public class NpcIndicatorsPlugin extends Plugin
 		}
 
 		return npcSet;
+	}
+
+	@Subscribe
+	public void onNpcDespawned(NpcDespawned npcDespawned)
+	{
+		NPC npc = npcDespawned.getNpc();
+		highlightedNpcs.remove(npc);
+	}
+
+	@Override
+	public Collection<Overlay> getOverlays()
+	{
+		return Arrays.asList(npcClickboxOverlay, npcMinimapOverlay);
 	}
 
 	void updateNpcMenuOptions(boolean pressed)

@@ -84,18 +84,19 @@ public class NpcSceneOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		renderNpcRespawns(graphics);
-
-		Set<NPC> npcSet = plugin.getHighlightedNpcs();
-		for (NPC npc : npcSet)
+		for (NPC npc : plugin.getHighlightedNpcs())
 		{
 			renderNpcOverlay(graphics, npc, npc.getName(), config.getNpcColor());
 		}
 
-		for (NPC npc : plugin.getTaggedNpcs())
+		NPC[] npcs = client.getCachedNPCs();
+		for (int npcId : plugin.getNpcTags())
 		{
-			String npcName = npc.getName();
-			renderNpcOverlay(graphics, npc, npcName, config.getTagColor());
+			NPC npc = npcs[npcId];
+			if (npc != null && npc.getName() != null)
+			{
+				renderNpcOverlay(graphics, npc, npc.getName(), config.getTagColor());
+			}
 		}
 
 		return null;
