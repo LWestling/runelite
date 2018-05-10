@@ -29,8 +29,10 @@ import java.awt.Dimension;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.runelite.api.annotations.VisibleForDevtools;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.vars.AccountType;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetInfo;
 
@@ -55,6 +57,11 @@ public interface Client extends GameEngine
 	String getUsername();
 
 	void setUsername(String name);
+
+	/**
+	 * Gets the account type for the logged in player.
+	 */
+	AccountType getAccountType();
 
 	Canvas getCanvas();
 
@@ -100,6 +107,10 @@ public interface Client extends GameEngine
 	ItemComposition getItemDefinition(int id);
 
 	SpritePixels createItemSprite(int itemId, int quantity, int border, int shadowColor, int stackable, boolean noted, int scale);
+
+	SpritePixels getSprite(IndexDataBase source, int archiveId, int fileId);
+
+	IndexDataBase getIndexSprites();
 
 	int getBaseX();
 
@@ -163,16 +174,21 @@ public interface Client extends GameEngine
 
 	int[] getVarps();
 
-	Varcs getVarcs();
+	int getVar(VarPlayer varPlayer);
 
-	int getSetting(Setting setting);
+	int getVar(Varbits varbit);
 
-	int getSetting(Varbits varbit);
+	int getVar(VarClientInt varClientInt);
 
+	String getVar(VarClientStr varClientStr);
+
+	@VisibleForDevtools
 	void setSetting(Varbits varbit, int value);
 
+	@VisibleForDevtools
 	int getVarbitValue(int varbit);
 
+	@VisibleForDevtools
 	void setVarbitValue(int varbit, int value);
 
 	HashTable getWidgetFlags();
@@ -221,6 +237,8 @@ public interface Client extends GameEngine
 	LocalPoint getLocalDestinationLocation();
 
 	List<Projectile> getProjectiles();
+
+	List<GraphicsObject> getGraphicsObjects();
 
 	/**
 	 * Play a sound effect at the player's current location. This is how UI,
@@ -415,4 +433,26 @@ public interface Client extends GameEngine
 	void setProjectilesHidden(boolean state);
 
 	CollisionData[] getCollisionMaps();
+
+	@VisibleForDevtools
+	int[] getBoostedSkillLevels();
+
+	@VisibleForDevtools
+	int[] getRealSkillLevels();
+
+	@VisibleForDevtools
+	int[] getSkillExperiences();
+
+	@VisibleForDevtools
+	int[] getChangedSkills();
+
+	@VisibleForDevtools
+	int getChangedSkillsCount();
+
+	@VisibleForDevtools
+	void setChangedSkillsCount(int i);
+
+	int getTickCount();
+
+	void setTickCount(int tickCount);
 }

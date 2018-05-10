@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Tomas Slusny <slusnucky@gmail.com>
+ * Copyright (c) 2018, Woox <https://github.com/wooxsolo>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,11 +22,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api;
+package net.runelite.mixins;
 
-public interface Varcs
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.mixins.Inject;
+import net.runelite.api.mixins.Mixin;
+import net.runelite.rs.api.RSGraphicsObject;
+
+@Mixin(RSGraphicsObject.class)
+public abstract class GraphicsObjectMixin implements RSGraphicsObject
 {
-	int getIntVar(VarClientInt var);
-
-	String getStrVar(VarClientStr var);
+	@Override
+	@Inject
+	public LocalPoint getLocation()
+	{
+		return new LocalPoint(this.getX(), this.getY());
+	}
 }

@@ -22,23 +22,26 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api;
+package net.runelite.client.plugins.cluescrolls.clues.hotcold;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum Setting
+public enum HotColdArea
 {
-	ATTACK_STYLE(43),
+	ASGARNIA("Asgarnia"),
+	DESERT("Desert"),
+	FELDIP_HILLS("Feldip Hills"),
+	FREMENNIK_PROVINCE("Fremennik Province"),
+	KANDARIN("Kandarin"),
+	KARAMJA("Karamja"),
+	MISTHALIN("Misthalin"),
+	MORYTANIA("Morytania"),
+	WESTERN_PROVINCE("Western Province"),
+	WILDERNESS("Wilderness"),
+	ZEAH("Zeah");
 
-	BANK_TAB(115),
-
-	SPECIAL_ATTACK_PERCENT(300),
-	SPECIAL_ATTACK_ENABLED(301),
-
-	IN_RAID_PARTY(1427);
-
-	private final int id;
+	private final String name;
 }
