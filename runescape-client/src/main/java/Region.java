@@ -289,7 +289,7 @@ public class Region {
 
             for(int var6 = 0; var6 < var5.entityCount; ++var6) {
                GameObject var7 = var5.objects[var6];
-               long var9 = var7.field1863;
+               long var9 = var7.hash;
                int var11 = (int)(var9 >>> 14 & 3L);
                boolean var8 = var11 == 2;
                if(var8 && var7.relativeX == var1 && var2 == var7.relativeY) {
@@ -358,15 +358,16 @@ public class Region {
    @ObfuscatedSignature(
       signature = "(IIIILdz;JI)V"
    )
-   public void method2907(int var1, int var2, int var3, int var4, Renderable var5, long var6, int var8) {
+   @Export("groundObjectSpawned")
+   public void groundObjectSpawned(int var1, int var2, int var3, int var4, Renderable var5, long var6, int var8) {
       if(var5 != null) {
          GroundObject var9 = new GroundObject();
          var9.renderable = var5;
          var9.x = var2 * 128 + 64;
          var9.y = var3 * 128 + 64;
          var9.floor = var4;
-         var9.field1550 = var6;
-         var9.field1557 = var8;
+         var9.hash = var6;
+         var9.renderInfoBitPacked = var8;
          if(this.tiles[var1][var2][var3] == null) {
             this.tiles[var1][var2][var3] = new Tile(var1, var2, var3);
          }
@@ -379,20 +380,21 @@ public class Region {
    @ObfuscatedSignature(
       signature = "(IIIILdz;JLdz;Ldz;)V"
    )
-   public void method2908(int var1, int var2, int var3, int var4, Renderable var5, long var6, Renderable var8, Renderable var9) {
+   @Export("addItemPile")
+   public void addItemPile(int var1, int var2, int var3, int var4, Renderable var5, long var6, Renderable var8, Renderable var9) {
       ItemLayer var10 = new ItemLayer();
       var10.bottom = var5;
       var10.x = var2 * 128 + 64;
       var10.y = var3 * 128 + 64;
-      var10.hash = var4;
-      var10.field1476 = var6;
+      var10.tileHeight = var4;
+      var10.hash = var6;
       var10.middle = var8;
       var10.top = var9;
       int var11 = 0;
       Tile var12 = this.tiles[var1][var2][var3];
       if(var12 != null) {
          for(int var13 = 0; var13 < var12.entityCount; ++var13) {
-            if((var12.objects[var13].field1874 & 256) == 256 && var12.objects[var13].renderable instanceof Model) {
+            if((var12.objects[var13].flags & 256) == 256 && var12.objects[var13].renderable instanceof Model) {
                Model var14 = (Model)var12.objects[var13].renderable;
                var14.calculateBoundsCylinder();
                if(var14.modelHeight > var11) {
@@ -414,11 +416,12 @@ public class Region {
    @ObfuscatedSignature(
       signature = "(IIIILdz;Ldz;IIJI)V"
    )
-   public void method2909(int var1, int var2, int var3, int var4, Renderable var5, Renderable var6, int var7, int var8, long var9, int var11) {
+   @Export("addBoundary")
+   public void addBoundary(int var1, int var2, int var3, int var4, Renderable var5, Renderable var6, int var7, int var8, long var9, int var11) {
       if(var5 != null || var6 != null) {
          WallObject var12 = new WallObject();
-         var12.field1818 = var9;
-         var12.field1814 = var11;
+         var12.hash = var9;
+         var12.config = var11;
          var12.x = var2 * 128 + 64;
          var12.y = var3 * 128 + 64;
          var12.floor = var4;
@@ -441,15 +444,16 @@ public class Region {
    @ObfuscatedSignature(
       signature = "(IIIILdz;Ldz;IIIIJI)V"
    )
-   public void method2910(int var1, int var2, int var3, int var4, Renderable var5, Renderable var6, int var7, int var8, int var9, int var10, long var11, int var13) {
+   @Export("addBoundaryDecoration")
+   public void addBoundaryDecoration(int var1, int var2, int var3, int var4, Renderable var5, Renderable var6, int var7, int var8, int var9, int var10, long var11, int var13) {
       if(var5 != null) {
          DecorativeObject var14 = new DecorativeObject();
-         var14.field1851 = var11;
-         var14.field1857 = var13;
+         var14.hash = var11;
+         var14.renderInfoBitPacked = var13;
          var14.x = var2 * 128 + 64;
          var14.y = var3 * 128 + 64;
          var14.floor = var4;
-         var14.field1854 = var5;
+         var14.renderable1 = var5;
          var14.renderable2 = var6;
          var14.renderFlag = var7;
          var14.rotation = var8;
@@ -476,7 +480,7 @@ public class Region {
       } else {
          int var12 = var5 * 64 + var2 * 128;
          int var13 = var6 * 64 + var3 * 128;
-         return this.method2914(var1, var2, var3, var5, var6, var12, var13, var4, var7, var8, false, var9, var11);
+         return this.addEntityMarker(var1, var2, var3, var5, var6, var12, var13, var4, var7, var8, false, var9, var11);
       }
    }
 
@@ -514,7 +518,7 @@ public class Region {
          var12 /= 128;
          var13 /= 128;
          var14 /= 128;
-         return this.method2914(var1, var11, var12, var13 - var11 + 1, var14 - var12 + 1, var2, var3, var4, var6, var7, true, var8, 0);
+         return this.addEntityMarker(var1, var11, var12, var13 - var11 + 1, var14 - var12 + 1, var2, var3, var4, var6, var7, true, var8, 0);
       }
    }
 
@@ -523,14 +527,15 @@ public class Region {
       signature = "(IIIIILdz;IJIIII)Z"
    )
    public boolean method2971(int var1, int var2, int var3, int var4, int var5, Renderable var6, int var7, long var8, int var10, int var11, int var12, int var13) {
-      return var6 == null?true:this.method2914(var1, var10, var11, var12 - var10 + 1, var13 - var11 + 1, var2, var3, var4, var6, var7, true, var8, 0);
+      return var6 == null?true:this.addEntityMarker(var1, var10, var11, var12 - var10 + 1, var13 - var11 + 1, var2, var3, var4, var6, var7, true, var8, 0);
    }
 
    @ObfuscatedName("e")
    @ObfuscatedSignature(
       signature = "(IIIIIIIILdz;IZJI)Z"
    )
-   boolean method2914(int var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, Renderable var9, int var10, boolean var11, long var12, int var14) {
+   @Export("addEntityMarker")
+   boolean addEntityMarker(int var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, Renderable var9, int var10, boolean var11, long var12, int var14) {
       int var16;
       for(int var15 = var2; var15 < var2 + var4; ++var15) {
          for(var16 = var3; var16 < var3 + var5; ++var16) {
@@ -546,14 +551,14 @@ public class Region {
       }
 
       GameObject var21 = new GameObject();
-      var21.field1863 = var12;
-      var21.field1874 = var14;
+      var21.hash = var12;
+      var21.flags = var14;
       var21.plane = var1;
       var21.x = var6;
       var21.y = var7;
       var21.height = var8;
       var21.renderable = var9;
-      var21.field1866 = var10;
+      var21.orientation = var10;
       var21.relativeX = var2;
       var21.relativeY = var3;
       var21.offsetX = var2 + var4 - 1;
@@ -681,7 +686,7 @@ public class Region {
       if(var4 != null) {
          for(int var5 = 0; var5 < var4.entityCount; ++var5) {
             GameObject var6 = var4.objects[var5];
-            long var8 = var6.field1863;
+            long var8 = var6.hash;
             int var10 = (int)(var8 >>> 14 & 3L);
             boolean var7 = var10 == 2;
             if(var7 && var2 == var6.relativeX && var3 == var6.relativeY) {
@@ -739,7 +744,7 @@ public class Region {
       } else {
          for(int var5 = 0; var5 < var4.entityCount; ++var5) {
             GameObject var6 = var4.objects[var5];
-            long var8 = var6.field1863;
+            long var8 = var6.hash;
             int var10 = (int)(var8 >>> 14 & 3L);
             boolean var7 = var10 == 2;
             if(var7 && var2 == var6.relativeX && var3 == var6.relativeY) {
@@ -764,13 +769,13 @@ public class Region {
    @ObfuscatedName("as")
    public long method2927(int var1, int var2, int var3) {
       Tile var4 = this.tiles[var1][var2][var3];
-      return var4 != null && var4.wallObject != null?var4.wallObject.field1818:0L;
+      return var4 != null && var4.wallObject != null?var4.wallObject.hash :0L;
    }
 
    @ObfuscatedName("aw")
    public long method2928(int var1, int var2, int var3) {
       Tile var4 = this.tiles[var1][var2][var3];
-      return var4 != null && var4.decorativeObject != null?var4.decorativeObject.field1851:0L;
+      return var4 != null && var4.decorativeObject != null?var4.decorativeObject.hash :0L;
    }
 
    @ObfuscatedName("ag")
@@ -781,11 +786,11 @@ public class Region {
       } else {
          for(int var5 = 0; var5 < var4.entityCount; ++var5) {
             GameObject var6 = var4.objects[var5];
-            long var8 = var6.field1863;
+            long var8 = var6.hash;
             int var10 = (int)(var8 >>> 14 & 3L);
             boolean var7 = var10 == 2;
             if(var7 && var2 == var6.relativeX && var3 == var6.relativeY) {
-               return var6.field1863;
+               return var6.hash;
             }
          }
 
@@ -796,7 +801,7 @@ public class Region {
    @ObfuscatedName("ah")
    public long method2930(int var1, int var2, int var3) {
       Tile var4 = this.tiles[var1][var2][var3];
-      return var4 != null && var4.groundObject != null?var4.groundObject.field1550:0L;
+      return var4 != null && var4.groundObject != null?var4.groundObject.hash :0L;
    }
 
    @ObfuscatedName("az")
@@ -804,16 +809,16 @@ public class Region {
       Tile var6 = this.tiles[var1][var2][var3];
       if(var6 == null) {
          return -1;
-      } else if(var6.wallObject != null && var6.wallObject.field1818 == var4) {
-         return var6.wallObject.field1814 & 255;
-      } else if(var6.decorativeObject != null && var6.decorativeObject.field1851 == var4) {
-         return var6.decorativeObject.field1857 & 255;
-      } else if(var6.groundObject != null && var6.groundObject.field1550 == var4) {
-         return var6.groundObject.field1557 & 255;
+      } else if(var6.wallObject != null && var6.wallObject.hash == var4) {
+         return var6.wallObject.config & 255;
+      } else if(var6.decorativeObject != null && var6.decorativeObject.hash == var4) {
+         return var6.decorativeObject.renderInfoBitPacked & 255;
+      } else if(var6.groundObject != null && var6.groundObject.hash == var4) {
+         return var6.groundObject.renderInfoBitPacked & 255;
       } else {
          for(int var7 = 0; var7 < var6.entityCount; ++var7) {
-            if(var6.objects[var7].field1863 == var4) {
-               return var6.objects[var7].field1874 & 255;
+            if(var6.objects[var7].hash == var4) {
+               return var6.objects[var7].flags & 255;
             }
          }
 
@@ -1352,13 +1357,13 @@ public class Region {
 
                                     var10 = var9.wallObject;
                                     if(var10 != null) {
-                                       var10.renderable1.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var10.x - cameraX2, var10.floor - cameraY2, var10.y - cameraZ2, var10.field1818);
+                                       var10.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var10.x - cameraX2, var10.floor - cameraY2, var10.y - cameraZ2, var10.hash);
                                     }
 
                                     for(var11 = 0; var11 < var9.entityCount; ++var11) {
                                        var12 = var9.objects[var11];
                                        if(var12 != null) {
-                                          var12.renderable.vmethod3079(var12.field1866, pitchSin, pitchCos, yawSin, yawCos, var12.x - cameraX2, var12.height - cameraY2, var12.y - cameraZ2, var12.field1863);
+                                          var12.renderable.draw(var12.orientation, pitchSin, pitchCos, yawSin, yawCos, var12.x - cameraX2, var12.height - cameraY2, var12.y - cameraZ2, var12.hash);
                                        }
                                     }
                                  }
@@ -1421,17 +1426,17 @@ public class Region {
                                     }
 
                                     if((var31.orientationA & var11) != 0 && !this.isWallOccluded(var7, var4, var5, var31.orientationA)) {
-                                       var31.renderable1.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var31.x - cameraX2, var31.floor - cameraY2, var31.y - cameraZ2, var31.field1818);
+                                       var31.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var31.x - cameraX2, var31.floor - cameraY2, var31.y - cameraZ2, var31.hash);
                                     }
 
                                     if((var31.orientationB & var11) != 0 && !this.isWallOccluded(var7, var4, var5, var31.orientationB)) {
-                                       var31.renderable2.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var31.x - cameraX2, var31.floor - cameraY2, var31.y - cameraZ2, var31.field1818);
+                                       var31.renderable2.draw(0, pitchSin, pitchCos, yawSin, yawCos, var31.x - cameraX2, var31.floor - cameraY2, var31.y - cameraZ2, var31.hash);
                                     }
                                  }
 
-                                 if(var13 != null && !this.isOccluded(var7, var4, var5, var13.field1854.modelHeight)) {
+                                 if(var13 != null && !this.isOccluded(var7, var4, var5, var13.renderable1.modelHeight)) {
                                     if((var13.renderFlag & var11) != 0) {
-                                       var13.field1854.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var13.x - cameraX2 + var13.offsetX, var13.floor - cameraY2, var13.y - cameraZ2 + var13.offsetY, var13.field1851);
+                                       var13.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var13.x - cameraX2 + var13.offsetX, var13.floor - cameraY2, var13.y - cameraZ2 + var13.offsetY, var13.hash);
                                     } else if(var13.renderFlag == 256) {
                                        var14 = var13.x - cameraX2;
                                        var15 = var13.floor - cameraY2;
@@ -1451,9 +1456,9 @@ public class Region {
                                        }
 
                                        if(var19 < var18) {
-                                          var13.field1854.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var14 + var13.offsetX, var15, var16 + var13.offsetY, var13.field1851);
+                                          var13.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var14 + var13.offsetX, var15, var16 + var13.offsetY, var13.hash);
                                        } else if(var13.renderable2 != null) {
-                                          var13.renderable2.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var14, var15, var16, var13.field1851);
+                                          var13.renderable2.draw(0, pitchSin, pitchCos, yawSin, yawCos, var14, var15, var16, var13.hash);
                                        }
                                     }
                                  }
@@ -1461,21 +1466,21 @@ public class Region {
                                  if(var20) {
                                     GroundObject var22 = var3.groundObject;
                                     if(var22 != null) {
-                                       var22.renderable.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var22.x - cameraX2, var22.floor - cameraY2, var22.y - cameraZ2, var22.field1550);
+                                       var22.renderable.draw(0, pitchSin, pitchCos, yawSin, yawCos, var22.x - cameraX2, var22.floor - cameraY2, var22.y - cameraZ2, var22.hash);
                                     }
 
                                     ItemLayer var23 = var3.itemLayer;
                                     if(var23 != null && var23.height == 0) {
                                        if(var23.middle != null) {
-                                          var23.middle.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var23.x - cameraX2, var23.hash - cameraY2, var23.y - cameraZ2, var23.field1476);
+                                          var23.middle.draw(0, pitchSin, pitchCos, yawSin, yawCos, var23.x - cameraX2, var23.tileHeight - cameraY2, var23.y - cameraZ2, var23.hash);
                                        }
 
                                        if(var23.top != null) {
-                                          var23.top.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var23.x - cameraX2, var23.hash - cameraY2, var23.y - cameraZ2, var23.field1476);
+                                          var23.top.draw(0, pitchSin, pitchCos, yawSin, yawCos, var23.x - cameraX2, var23.tileHeight - cameraY2, var23.y - cameraZ2, var23.hash);
                                        }
 
                                        if(var23.bottom != null) {
-                                          var23.bottom.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var23.x - cameraX2, var23.hash - cameraY2, var23.y - cameraZ2, var23.field1476);
+                                          var23.bottom.draw(0, pitchSin, pitchCos, yawSin, yawCos, var23.x - cameraX2, var23.tileHeight - cameraY2, var23.y - cameraZ2, var23.hash);
                                        }
                                     }
                                  }
@@ -1526,7 +1531,7 @@ public class Region {
                                  if(var20) {
                                     var10 = var3.wallObject;
                                     if(!this.isWallOccluded(var7, var4, var5, var10.orientationA)) {
-                                       var10.renderable1.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var10.x - cameraX2, var10.floor - cameraY2, var10.y - cameraZ2, var10.field1818);
+                                       var10.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var10.x - cameraX2, var10.floor - cameraY2, var10.y - cameraZ2, var10.hash);
                                     }
 
                                     var3.wallCullDirection = 0;
@@ -1626,7 +1631,7 @@ public class Region {
                                     GameObject var33 = entityBuffer[var25];
                                     var33.cycle = cycle;
                                     if(!this.isAreaOccluded(var7, var33.relativeX, var33.offsetX, var33.relativeY, var33.offsetY, var33.renderable.modelHeight)) {
-                                       var33.renderable.vmethod3079(var33.field1866, pitchSin, pitchCos, yawSin, yawCos, var33.x - cameraX2, var33.height - cameraY2, var33.y - cameraZ2, var33.field1863);
+                                       var33.renderable.draw(var33.orientation, pitchSin, pitchCos, yawSin, yawCos, var33.x - cameraX2, var33.height - cameraY2, var33.y - cameraZ2, var33.hash);
                                     }
 
                                     for(var14 = var33.relativeX; var14 <= var33.offsetX; ++var14) {
@@ -1685,23 +1690,23 @@ public class Region {
          ItemLayer var32 = var3.itemLayer;
          if(var32 != null && var32.height != 0) {
             if(var32.middle != null) {
-               var32.middle.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var32.x - cameraX2, var32.hash - cameraY2 - var32.height, var32.y - cameraZ2, var32.field1476);
+               var32.middle.draw(0, pitchSin, pitchCos, yawSin, yawCos, var32.x - cameraX2, var32.tileHeight - cameraY2 - var32.height, var32.y - cameraZ2, var32.hash);
             }
 
             if(var32.top != null) {
-               var32.top.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var32.x - cameraX2, var32.hash - cameraY2 - var32.height, var32.y - cameraZ2, var32.field1476);
+               var32.top.draw(0, pitchSin, pitchCos, yawSin, yawCos, var32.x - cameraX2, var32.tileHeight - cameraY2 - var32.height, var32.y - cameraZ2, var32.hash);
             }
 
             if(var32.bottom != null) {
-               var32.bottom.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var32.x - cameraX2, var32.hash - cameraY2 - var32.height, var32.y - cameraZ2, var32.field1476);
+               var32.bottom.draw(0, pitchSin, pitchCos, yawSin, yawCos, var32.x - cameraX2, var32.tileHeight - cameraY2 - var32.height, var32.y - cameraZ2, var32.hash);
             }
          }
 
          if(var3.wallDrawFlags != 0) {
             DecorativeObject var29 = var3.decorativeObject;
-            if(var29 != null && !this.isOccluded(var7, var4, var5, var29.field1854.modelHeight)) {
+            if(var29 != null && !this.isOccluded(var7, var4, var5, var29.renderable1.modelHeight)) {
                if((var29.renderFlag & var3.wallDrawFlags) != 0) {
-                  var29.field1854.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var29.x - cameraX2 + var29.offsetX, var29.floor - cameraY2, var29.y - cameraZ2 + var29.offsetY, var29.field1851);
+                  var29.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var29.x - cameraX2 + var29.offsetX, var29.floor - cameraY2, var29.y - cameraZ2 + var29.offsetY, var29.hash);
                } else if(var29.renderFlag == 256) {
                   var11 = var29.x - cameraX2;
                   var25 = var29.floor - cameraY2;
@@ -1720,9 +1725,9 @@ public class Region {
                   }
 
                   if(var16 >= var15) {
-                     var29.field1854.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var11 + var29.offsetX, var25, var24 + var29.offsetY, var29.field1851);
+                     var29.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var11 + var29.offsetX, var25, var24 + var29.offsetY, var29.hash);
                   } else if(var29.renderable2 != null) {
-                     var29.renderable2.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var11, var25, var24, var29.field1851);
+                     var29.renderable2.draw(0, pitchSin, pitchCos, yawSin, yawCos, var11, var25, var24, var29.hash);
                   }
                }
             }
@@ -1730,11 +1735,11 @@ public class Region {
             WallObject var27 = var3.wallObject;
             if(var27 != null) {
                if((var27.orientationB & var3.wallDrawFlags) != 0 && !this.isWallOccluded(var7, var4, var5, var27.orientationB)) {
-                  var27.renderable2.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var27.x - cameraX2, var27.floor - cameraY2, var27.y - cameraZ2, var27.field1818);
+                  var27.renderable2.draw(0, pitchSin, pitchCos, yawSin, yawCos, var27.x - cameraX2, var27.floor - cameraY2, var27.y - cameraZ2, var27.hash);
                }
 
                if((var27.orientationA & var3.wallDrawFlags) != 0 && !this.isWallOccluded(var7, var4, var5, var27.orientationA)) {
-                  var27.renderable1.vmethod3079(0, pitchSin, pitchCos, yawSin, yawCos, var27.x - cameraX2, var27.floor - cameraY2, var27.y - cameraZ2, var27.field1818);
+                  var27.renderable1.draw(0, pitchSin, pitchCos, yawSin, yawCos, var27.x - cameraX2, var27.floor - cameraY2, var27.y - cameraZ2, var27.hash);
                }
             }
          }

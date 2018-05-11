@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018, DennisDeV <https://github.com/DevDennis>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,37 +22,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.rs.api;
+package net.runelite.client.plugins.antidrag;
 
-import net.runelite.api.ItemLayer;
-import net.runelite.mapping.Import;
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
 
-public interface RSItemLayer extends ItemLayer
+@ConfigGroup(
+	keyName = AntiDragPlugin.CONFIG_GROUP,
+	name = "Anti Drag",
+	description = "Configuration for the anti drag plugin"
+)
+public interface AntiDragConfig extends Config
 {
-	@Import("x")
-	int getX();
+	@ConfigItem(
+		keyName = "dragDelay",
+		name = "Drag Delay",
+		description = "Configures the inventory drag delay in client ticks (20ms)",
+		position = 1
+	)
+	default int dragDelay()
+	{
+		return 600 / 20; // one game tick
+	}
 
-	@Import("y")
-	int getY();
+	@ConfigItem(
+		keyName = "dragDelay",
+		name = "",
+		description = ""
+	)
+	void dragDelay(int delay);
 
-	@Import("hash")
-	@Override
-	long getHash();
-
-	@Import("height")
-	int getHeight();
-
-	@Import("bottom")
-	@Override
-	RSRenderable getBottom();
-
-	@Import("middle")
-	@Override
-	RSRenderable getMiddle();
-
-	@Import("top")
-	@Override
-	RSRenderable getTop();
-
-	void setPlane(int plane);
+	@ConfigItem(
+		keyName = "onShiftOnly",
+		name = "On Shift Only",
+		description = "Configures whether to only adjust the delay while holding shift",
+		position = 2
+	)
+	default boolean onShiftOnly()
+	{
+		return true;
+	}
 }

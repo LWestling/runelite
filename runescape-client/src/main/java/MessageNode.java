@@ -544,7 +544,7 @@ public class MessageNode extends CacheableNode {
                   if(var9 == 0) {
                      WallObject var34 = ScriptEvent.region.method3049(class192.plane, var3, var38);
                      if(var34 != null) {
-                        var11 = class8.method93(var34.field1818);
+                        var11 = class8.method93(var34.hash);
                         if(var31 == 2) {
                            var34.renderable1 = new DynamicObject(var11, 2, var8 + 4, class192.plane, var3, var38, var5, false, var34.renderable1);
                            var34.renderable2 = new DynamicObject(var11, 2, var8 + 1 & 3, class192.plane, var3, var38, var5, false, var34.renderable2);
@@ -557,18 +557,18 @@ public class MessageNode extends CacheableNode {
                   if(var9 == 1) {
                      DecorativeObject var42 = ScriptEvent.region.method2924(class192.plane, var3, var38);
                      if(var42 != null) {
-                        var11 = class8.method93(var42.field1851);
+                        var11 = class8.method93(var42.hash);
                         if(var31 != 4 && var31 != 5) {
                            if(var31 == 6) {
-                              var42.field1854 = new DynamicObject(var11, 4, var8 + 4, class192.plane, var3, var38, var5, false, var42.field1854);
+                              var42.renderable1 = new DynamicObject(var11, 4, var8 + 4, class192.plane, var3, var38, var5, false, var42.renderable1);
                            } else if(var31 == 7) {
-                              var42.field1854 = new DynamicObject(var11, 4, (var8 + 2 & 3) + 4, class192.plane, var3, var38, var5, false, var42.field1854);
+                              var42.renderable1 = new DynamicObject(var11, 4, (var8 + 2 & 3) + 4, class192.plane, var3, var38, var5, false, var42.renderable1);
                            } else if(var31 == 8) {
-                              var42.field1854 = new DynamicObject(var11, 4, var8 + 4, class192.plane, var3, var38, var5, false, var42.field1854);
+                              var42.renderable1 = new DynamicObject(var11, 4, var8 + 4, class192.plane, var3, var38, var5, false, var42.renderable1);
                               var42.renderable2 = new DynamicObject(var11, 4, (var8 + 2 & 3) + 4, class192.plane, var3, var38, var5, false, var42.renderable2);
                            }
                         } else {
-                           var42.field1854 = new DynamicObject(var11, 4, var8, class192.plane, var3, var38, var5, false, var42.field1854);
+                           var42.renderable1 = new DynamicObject(var11, 4, var8, class192.plane, var3, var38, var5, false, var42.renderable1);
                         }
                      }
                   }
@@ -580,14 +580,14 @@ public class MessageNode extends CacheableNode {
                      }
 
                      if(var43 != null) {
-                        var43.renderable = new DynamicObject(class8.method93(var43.field1863), var31, var8, class192.plane, var3, var38, var5, false, var43.renderable);
+                        var43.renderable = new DynamicObject(class8.method93(var43.hash), var31, var8, class192.plane, var3, var38, var5, false, var43.renderable);
                      }
                   }
 
                   if(var9 == 3) {
                      GroundObject var44 = ScriptEvent.region.getFloorDecoration(class192.plane, var3, var38);
                      if(var44 != null) {
-                        var44.renderable = new DynamicObject(class8.method93(var44.field1550), 22, var8, class192.plane, var3, var38, var5, false, var44.renderable);
+                        var44.renderable = new DynamicObject(class8.method93(var44.hash), 22, var8, class192.plane, var3, var38, var5, false, var44.renderable);
                      }
                   }
                }

@@ -29,6 +29,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import net.runelite.api.ChatMessageType;
 import net.runelite.api.ClanMember;
+import net.runelite.api.Friend;
 import net.runelite.api.GameState;
 import net.runelite.api.GrandExchangeOffer;
 import net.runelite.api.GraphicsObject;
@@ -74,7 +75,6 @@ import net.runelite.api.events.PlayerMenuOptionsChanged;
 import net.runelite.api.events.PlayerSpawned;
 import net.runelite.api.events.ResizeableChanged;
 import net.runelite.api.events.UsernameChanged;
-import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.mixins.Copy;
 import net.runelite.api.mixins.FieldHook;
@@ -91,11 +91,14 @@ import static net.runelite.client.callback.Hooks.eventBus;
 import net.runelite.rs.api.RSClanMemberManager;
 import net.runelite.rs.api.RSClient;
 import net.runelite.rs.api.RSDeque;
+import net.runelite.rs.api.RSFriendContainer;
+import net.runelite.rs.api.RSFriendManager;
 import net.runelite.rs.api.RSHashTable;
 import net.runelite.rs.api.RSIndexedSprite;
 import net.runelite.rs.api.RSItemContainer;
 import net.runelite.rs.api.RSNPC;
 import net.runelite.rs.api.RSName;
+import net.runelite.rs.api.RSNameable;
 import net.runelite.rs.api.RSPlayer;
 import net.runelite.rs.api.RSWidget;
 
@@ -122,6 +125,15 @@ public abstract class RSClientMixin implements RSClient
 
 	@Inject
 	private static RSNPC[] oldNpcs = new RSNPC[32768];
+
+	@Inject
+	private static int itemPressedDurationBuffer;
+
+	@Inject
+	private static int inventoryDragDelay;
+
+	@Inject
+	private static boolean hasVarbitChanged;
 
 	@Inject
 	@Override
@@ -163,6 +175,13 @@ public abstract class RSClientMixin implements RSClient
 	public void setInterpolateObjectAnimations(boolean interpolate)
 	{
 		interpolateObjectAnimations = interpolate;
+	}
+
+	@Inject
+	@Override
+	public void setInventoryDragDelay(int delay)
+	{
+		inventoryDragDelay = delay;
 	}
 
 	@Inject
@@ -523,27 +542,6 @@ public abstract class RSClientMixin implements RSClient
 
 	@Inject
 	@Override
-	public boolean getBoundingBoxAlwaysOnMode()
-	{
-		return getboundingBox3DDrawMode() == getALWAYSDrawMode();
-	}
-
-	@Inject
-	@Override
-	public void setBoundingBoxAlwaysOnMode(boolean alwaysDrawBoxes)
-	{
-		if (alwaysDrawBoxes)
-		{
-			setboundingBox3DDrawMode(getALWAYSDrawMode());
-		}
-		else
-		{
-			setboundingBox3DDrawMode(getON_MOUSEOVERDrawMode());
-		}
-	}
-
-	@Inject
-	@Override
 	public void changeMemoryMode(boolean lowMemory)
 	{
 		setLowMemory(lowMemory);
@@ -582,6 +580,26 @@ public abstract class RSClientMixin implements RSClient
 	{
 		final RSClanMemberManager clanMemberManager = getClanMemberManager();
 		return clanMemberManager != null ? (ClanMember[]) getClanMemberManager().getNameables() : null;
+	}
+
+	@Inject
+	@Override
+	public Friend[] getFriends()
+	{
+		final RSFriendManager friendManager = getFriendManager();
+		if (friendManager == null)
+		{
+			return null;
+		}
+
+		final RSFriendContainer friendContainer = friendManager.getFriendContainer();
+		if (friendContainer == null)
+		{
+			return null;
+		}
+
+		RSNameable[] nameables = friendContainer.getNameables();
+		return (Friend[]) nameables;
 	}
 
 	@Inject
@@ -651,6 +669,28 @@ public abstract class RSClientMixin implements RSClient
 			WidgetLoaded event = new WidgetLoaded();
 			event.setGroupId(groupId);
 			eventBus.post(event);
+		}
+	}
+
+	@FieldHook("itemPressedDuration")
+	@Inject
+	public static void itemPressedDurationChanged(int idx)
+	{
+		if (client.getItemPressedDuration() > 0)
+		{
+			itemPressedDurationBuffer++;
+			if (itemPressedDurationBuffer >= inventoryDragDelay)
+			{
+				client.setItemPressedDuration(itemPressedDurationBuffer);
+			}
+			else
+			{
+				client.setItemPressedDuration(0);
+			}
+		}
+		else
+		{
+			itemPressedDurationBuffer = 0;
 		}
 	}
 
@@ -801,8 +841,16 @@ public abstract class RSClientMixin implements RSClient
 	@Inject
 	public static void settingsChanged(int idx)
 	{
-		VarbitChanged varbitChanged = new VarbitChanged();
-		eventBus.post(varbitChanged);
+		hasVarbitChanged = true;
+	}
+
+	@Inject
+	@Override
+	public boolean shouldPostVarbitEvent()
+	{
+		boolean ret = hasVarbitChanged;
+		hasVarbitChanged = false;
+		return ret;
 	}
 
 	@FieldHook("isResized")
