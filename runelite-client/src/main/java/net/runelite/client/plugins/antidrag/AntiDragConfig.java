@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, SomeoneWithAnInternetConnection
+ * Copyright (c) 2018, DennisDeV <https://github.com/DevDennis>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,9 +22,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.rs.api;
+package net.runelite.client.plugins.antidrag;
 
-public interface RSBoundingBox3DDrawMode
+import net.runelite.client.config.Config;
+import net.runelite.client.config.ConfigGroup;
+import net.runelite.client.config.ConfigItem;
+
+@ConfigGroup(
+	keyName = AntiDragPlugin.CONFIG_GROUP,
+	name = "Anti Drag",
+	description = "Configuration for the anti drag plugin"
+)
+public interface AntiDragConfig extends Config
 {
+	@ConfigItem(
+		keyName = "dragDelay",
+		name = "Drag Delay",
+		description = "Configures the inventory drag delay in client ticks (20ms)",
+		position = 1
+	)
+	default int dragDelay()
+	{
+		return 600 / 20; // one game tick
+	}
 
+	@ConfigItem(
+		keyName = "dragDelay",
+		name = "",
+		description = ""
+	)
+	void dragDelay(int delay);
+
+	@ConfigItem(
+		keyName = "onShiftOnly",
+		name = "On Shift Only",
+		description = "Configures whether to only adjust the delay while holding shift",
+		position = 2
+	)
+	default boolean onShiftOnly()
+	{
+		return true;
+	}
 }
